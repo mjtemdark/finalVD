@@ -183,6 +183,7 @@ PAIS_ISO3 = {
     "SINGAPUR": "SGP",
     "SIRIA": "SYR",
     "SRI LANKA": "LKA",
+    "CEYLAN": "LKA",
     "TAILANDIA": "THA",
     "TAIWAN": "TWN",
     "TAYIKISTAN": "TJK",
@@ -310,9 +311,9 @@ def agregar_iso3(df, columna="PAIS", nueva="ISO3"):
     df = df.copy()
     df[nueva] = df[columna].map(lambda x: PAIS_ISO3.get(normalizar(x)))
 
-    #faltan = sorted(df.loc[df[nueva].isna(), columna].dropna().unique())
-    #if faltan:
-    #    print("Países sin código ISO-3 (agrégalos a PAIS_ISO3):")
-    #    for p in faltan:
-    #        print("  -", p)
+    faltan = sorted(df.loc[df[nueva].isna(), columna].dropna().unique())
+    if faltan:
+        print("Países sin código ISO-3 (agrégalos a PAIS_ISO3):")
+        for p in faltan:
+            print("  -", p)
     return df

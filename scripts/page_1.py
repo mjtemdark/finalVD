@@ -80,15 +80,17 @@ def anotacion(txt):
 # ------------------------------------------------------------------
 # MAPA ANIMADO
 # ------------------------------------------------------------------
+
 fig = px.choropleth(
     datos,
     locations="ISO3",
     locationmode="ISO-3",
     color="valor",
     animation_frame="ANIO",
+    labels={"ANIO": "Año","NUMERO_VISITANTES":"Numero de visitantes"},
     range_color=(datos["valor"].min(), datos["valor"].max()),  # misma escala en todos los años
     hover_name="PAIS",
-    hover_data={"ISO3": False, "valor": False, "NUMERO_VISITANTES": ":,.0f"},
+    hover_data={"ISO3": False, "valor": False, "NUMERO_VISITANTES":":,.0f"},
     color_continuous_scale="YlOrRd",
     projection=proyeccion,
 )
