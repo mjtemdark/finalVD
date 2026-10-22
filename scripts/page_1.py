@@ -1,68 +1,100 @@
 import numpy as np
 import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 from pandas import DataFrame
 
-st.set_page_config(layout="wide")
 from helpers.paises_iso import agregar_iso3
 
-
+st.set_page_config(layout="wide")
 df: DataFrame = st.session_state.data
-df=agregar_iso3(df,"PAIS")
+df = agregar_iso3(df, "PAIS")
 
-st.dataframe(df)
+st.subheader("Evolución de la cantidad de turistas llegando al Perú desde 2019 hasta 2026")
 
-##FILTROS
-st.sidebar.header("Filtros")
-anios = sorted(int(a) for a in df["ANIO"].dropna().unique())
-anio = st.sidebar.select_slider("Año", options=["Todos"] + anios, value="Todos")
-
-##CONTROLES DE APARIENCIA
+## CONTROLES DE APARIENCIA
 st.sidebar.header("Apariencia")
-escala_log = st.sidebar.checkbox("Escala logarítmica (recomendada)", value=True)
-proyeccion = st.sidebar.selectbox("Proyección", ["natural earth", "equirectangular", "orthographic"])
-alto = st.sidebar.slider("Alto del mapa (px)", 500, 1000, 720, step=20)
+escala_log = st.sidebar.checkbox("Escala logarítmica", value=False)
 
-## FILTRO DE AÑO
-filtrado = df if anio == "Todos" else df[df["ANIO"] == anio]
+proyecciones = {
+    "Natural": "natural earth",
+    "Equirectangular": "equirectangular",
+    "Ortográfica": "orthographic"
+}
 
-datos = (
-    filtrado.dropna(subset=["ISO3"])
-    .groupby(["ISO3", "PAIS"], as_index=False)["NUMERO_VISITANTES"].sum()
+proyeccion = st.sidebar.selectbox(
+    "Proyección",
+    options=proyecciones.keys()
 )
 
+proyeccion = proyecciones[proyeccion]
+
+alto = st.sidebar.slider("Alto del mapa (px)", 500, 1000, 820, step=20)
+
+## DATOS (por año, país)
+datos = (
+    df.dropna(subset=["ISO3"])
+    .groupby(["ANIO", "ISO3", "PAIS"], as_index=False)["NUMERO_VISITANTES"].sum()
+    .sort_values("ANIO")
+)
 datos = datos[datos["NUMERO_VISITANTES"] > 0]
 
 if datos.empty:
-    st.warning("No hay datos para el año seleccionado.")
+    st.warning("No hay datos para mostrar.")
     st.stop()
 
 # AJUSTAR ESCALA
 datos["valor"] = np.log10(datos["NUMERO_VISITANTES"]) if escala_log else datos["NUMERO_VISITANTES"]
 
 # ------------------------------------------------------------------
-# INDICADORES
+# ESTADÍSTICAS POR AÑO (se muestran dentro del gráfico)
 # ------------------------------------------------------------------
-top = datos.sort_values("NUMERO_VISITANTES", ascending=False).iloc[0]
-c1, c2, c3 = st.columns(3)
-c1.metric("Total de visitantes", f"{datos['NUMERO_VISITANTES'].sum():,.0f}")
-c2.metric("Países de origen", f"{datos['ISO3'].nunique()}")
-c3.metric("País con más visitantes", top["PAIS"], f"{top['NUMERO_VISITANTES']:,.0f}", delta_color="off")
+stats = {}
+for a, g in datos.groupby("ANIO"):
+    top = g.loc[g["NUMERO_VISITANTES"].idxmax()]
+    stats[str(a)] = (
+        g["NUMERO_VISITANTES"].sum(),
+        g["ISO3"].nunique(),
+        top["PAIS"],
+        top["NUMERO_VISITANTES"],
+    )
+
+
+def texto_stats(a):
+    total, n, pais, v = stats[str(a)]
+    return (
+        f"<b>Total:</b> {total:,.0f}   |   "
+        f"<b>Países de origen:</b> {n}   |   "
+        f"<b>Principal país:</b> {pais} ({v:,.0f})"
+    )
+
+
+def anotacion(txt):
+    return dict(
+        text=txt, x=0.5, y=1.0, xref="paper", yref="paper",
+        xanchor="center", yanchor="bottom", showarrow=False,
+        font=dict(size=16),
+    )
+
 
 # ------------------------------------------------------------------
-# MAPA
+# MAPA ANIMADO
 # ------------------------------------------------------------------
 fig = px.choropleth(
     datos,
     locations="ISO3",
     locationmode="ISO-3",
     color="valor",
+    animation_frame="ANIO",
+    range_color=(datos["valor"].min(), datos["valor"].max()),  # misma escala en todos los años
     hover_name="PAIS",
     hover_data={"ISO3": False, "valor": False, "NUMERO_VISITANTES": ":,.0f"},
-    labels={"NUMERO_VISITANTES": "Visitantes"},
     color_continuous_scale="YlOrRd",
     projection=proyeccion,
 )
+
+# Velocidad de la animación (ms por año)
+fig.layout.updatemenus[0].buttons[0].args[1]["frame"]["duration"] = 800
 
 # BARRA DE COLOR CON VALORES REALES
 colorbar = dict(title="Visitantes", len=0.7, thickness=16, outlinewidth=0)
@@ -75,6 +107,7 @@ fig.update_coloraxes(colorbar=colorbar)
 
 # ESTILO DEL MAPA
 fig.update_geos(
+    projection_rotation=dict(lon=0, lat=0, roll=0),
     showframe=False,
     showcoastlines=True,
     coastlinecolor="#9aa5b1",
@@ -90,9 +123,14 @@ fig.update_geos(
 fig.update_traces(marker_line_color="#ffffff", marker_line_width=0.4)
 fig.update_layout(
     height=alto,
-    margin=dict(l=0, r=0, t=10, b=0),
+    margin=dict(l=0, r=0, t=50, b=0),  # espacio arriba para las estadísticas
     paper_bgcolor="rgba(0,0,0,0)",
     font=dict(family="Inter, Arial, sans-serif", size=13),
 )
 
-st.plotly_chart(fig, width='stretch')
+# ESTADÍSTICAS DENTRO DEL GRÁFICO: estado inicial y un texto por cada año
+fig.update_layout(annotations=[anotacion(texto_stats(datos["ANIO"].min()))])
+for fr in fig.frames:
+    fr.layout = go.Layout(annotations=[anotacion(texto_stats(fr.name))])
+
+st.plotly_chart(fig, width="stretch")

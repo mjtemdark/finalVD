@@ -36,6 +36,7 @@ PAIS_ISO3 = {
     "ESTADOS UNIDOS DE AMERICA": "USA",
     "EE.UU.": "USA",
     "EEUU": "USA",
+    "EE.UU": "USA",
     "USA": "USA",
     "CANADA": "CAN",
     "MEXICO": "MEX",
@@ -56,6 +57,7 @@ PAIS_ISO3 = {
     "TRINIDAD Y TOBAGO": "TTO",
     "PUERTO RICO": "PRI",
     "ANTIGUA Y BARBUDA": "ATG",
+    "ANT. BARBUDA": "ATG",
     "DOMINICA": "DMA",
     "GRANADA": "GRD",
     "SAN CRISTOBAL Y NIEVES": "KNA",
@@ -109,6 +111,7 @@ PAIS_ISO3 = {
     "ALBANIA": "ALB",
     "ANDORRA": "AND",
     "BIELORRUSIA": "BLR",
+    "BELORUSIA": "BLR",
     "BOSNIA Y HERZEGOVINA": "BIH",
     "BOSNIA HERZEGOVINA": "BIH",
     "KOSOVO": "XKX",
@@ -130,6 +133,7 @@ PAIS_ISO3 = {
 
     # --- Asia ---
     "AFGANISTAN": "AFG",
+    "AFGHANISTAN": "AFG",
     "ARABIA SAUDITA": "SAU",
     "ARABIA SAUDI": "SAU",
     "ARMENIA": "ARM",
@@ -137,10 +141,12 @@ PAIS_ISO3 = {
     "BAHREIN": "BHR",
     "BANGLADESH": "BGD",
     "BUTAN": "BTN",
+    "BHUTAN": "BTN",
     "BRUNEI": "BRN",
     "CAMBOYA": "KHM",
     "CHINA": "CHN",
     "REPUBLICA POPULAR CHINA": "CHN",
+    "CHINA (R.P)": "CHN",
     "COREA DEL SUR": "KOR",
     "COREA": "KOR",
     "REPUBLICA DE COREA": "KOR",
@@ -199,10 +205,13 @@ PAIS_ISO3 = {
     "CAMERUN": "CMR",
     "CHAD": "TCD",
     "COMORAS": "COM",
+    "COMORAS (ISL)": "COM",
     "CONGO": "COG",
     "REPUBLICA DEL CONGO": "COG",
     "REPUBLICA DEMOCRATICA DEL CONGO": "COD",
+    "DEMOC. REP. CONGO (ZAIRE)":"COD",
     "COSTA DE MARFIL": "CIV",
+    "COSTA MARFIL":"CIV",
     "EGIPTO": "EGY",
     "ERITREA": "ERI",
     "ESUATINI": "SWZ",
@@ -267,6 +276,29 @@ PAIS_ISO3 = {
     "ISLAS MARSHALL": "MHL",
     "NUEVA CALEDONIA": "NCL",
     "POLINESIA FRANCESA": "PYF",
+    "DJIBOUTI": "DJI",
+    "EX R. YUG. MACEDONIA": "MKD",
+    "GROENLANDIA": "GRL",
+    "ISLAND MARSHALL": "MHL",
+    "KATAR": "QAT",
+    "KAZAJSTAN": "KAZ",
+    "LESOTHO": "LSO",
+    "NUEVA ZELANDIA": "NZL",
+    "PAPUA (NG)": "PNG",
+    "PAISES BAJOS (HOLANDA)": "NLD",
+    "PTO. RICO": "PRI",
+    "R.F. YUGOSLAVIA": "SRB",
+    "REP. CENTROAFRICANA": "CAF",
+    "REP. CHECA": "CZE",
+    "REP. DOMINICANA": "DOM",
+    "REP. MOLDOVA": "MDA",
+    "RWANDA": "RWA",
+    "SALOMON ISLA": "SLB",
+    "SAMOA OCCIDENTAL": "WSM",
+    "SAN VIC. GRANADINAS": "VCT",
+    "SIKKIM": "IND",
+    "STO. TOME Y PRINCIPE": "STP",
+    "SWAZILANDIA": "SWZ",
 }
 
 
@@ -278,9 +310,9 @@ def agregar_iso3(df, columna="PAIS", nueva="ISO3"):
     df = df.copy()
     df[nueva] = df[columna].map(lambda x: PAIS_ISO3.get(normalizar(x)))
 
-    faltan = sorted(df.loc[df[nueva].isna(), columna].dropna().unique())
-    if faltan:
-        print("Países sin código ISO-3 (agrégalos a PAIS_ISO3):")
-        for p in faltan:
-            print("  -", p)
+    #faltan = sorted(df.loc[df[nueva].isna(), columna].dropna().unique())
+    #if faltan:
+    #    print("Países sin código ISO-3 (agrégalos a PAIS_ISO3):")
+    #    for p in faltan:
+    #        print("  -", p)
     return df
