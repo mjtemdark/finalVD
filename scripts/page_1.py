@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import streamlit as st
 from pandas import DataFrame
 
+from helpers.colors import escala_mapa
 from helpers.paises_iso import agregar_iso3
 
 st.set_page_config(layout="wide")
@@ -91,7 +92,7 @@ fig = px.choropleth(
     range_color=(datos["valor"].min(), datos["valor"].max()),  # misma escala en todos los años
     hover_name="PAIS",
     hover_data={"ISO3": False, "valor": False, "NUMERO_VISITANTES":":,.0f"},
-    color_continuous_scale="YlOrRd",
+    color_continuous_scale=escala_mapa,
     projection=proyeccion,
 )
 
