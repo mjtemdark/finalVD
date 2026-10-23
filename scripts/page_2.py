@@ -18,8 +18,13 @@ NO_ESPECIFICADO = {"", "-", "--", "NA", "N/A", "NAN", "NULL", "NONE", "SIN ESPEC
  
 df: DataFrame | None = st.session_state.get("data")
  
-st.subheader("Departamentos más visitados")
-st.write("Ranking de departamentos según el número total de visitantes.")
+st.subheader(
+    "Nombre del departamento del Perú donde se ubica la Oficina de Control Migratorio (OCM)"
+)
+st.write(
+    "Ranking por número total de visitantes internacionales registrados en las OCM "
+    "ubicadas en cada departamento."
+)
  
 if df is None or df.empty:
     st.warning("No hay datos disponibles para mostrar.")
@@ -39,7 +44,7 @@ if COL_ANIO in df.columns:
         datos = df[df[COL_ANIO].isin(anios)]
  
 incluir_sin_depto = st.sidebar.checkbox(
-    "Incluir departamento sin especificar ('-')", value=False
+    "Incluir departamento de la OCM sin especificar ('-')", value=False
 )
  
 datos = pd.DataFrame(
@@ -77,10 +82,13 @@ grafico = conteos.head(cantidad)
 lider = conteos.iloc[0]
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Total de visitantes", f"{total:,.0f}")
-c2.metric("Departamentos", f"{len(conteos):,}")
-c3.metric("Departamento líder", lider["Departamento"], f"{lider['Participación']:.1%} del total", delta_color="off")
+c2.metric("Departamentos con OCM", f"{len(conteos):,}")
+c3.metric("Departamento OCM con más registros", lider["Departamento"], f"{lider['Participación']:.1%} del total", delta_color="off")
 c4.metric("Concentración Top 3", f"{conteos.head(3)['Participación'].sum():.1%}")
-st.caption("Se suma la columna NUMERO_VISITANTES por departamento.")
+st.caption(
+    "El departamento identifica dónde se ubica la OCM; se suma NUMERO_VISITANTES "
+    "registrado en las OCM de cada departamento. No representa el destino visitado."
+)
 
 fig = go.Figure()
 for nivel, color in COLORES.items():
