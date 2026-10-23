@@ -7,7 +7,7 @@ from helpers.colors import paleta_turismo
 
 st.set_page_config(layout="wide")
 
-COL_DEPTO, COL_ANIO = "DEPARTAMENTO_OCM", "ANIO"
+COL_DEPTO, COL_ANIO, COL_VISITANTES = "DEPARTAMENTO_OCM", "ANIO", "NUMERO_VISITANTES"
 COLORES = {
     "Top 1": paleta_turismo[2],
     "Top 2": paleta_turismo[1],
