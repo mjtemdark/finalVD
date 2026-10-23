@@ -7,7 +7,7 @@ from helpers.colors import paleta_turismo
 
 st.set_page_config(layout="wide")
 
-COL_DEPTO, COL_ANIO, COL_VISITANTES = "DEPARTAMENTO_OCM", "ANIO", "NUMERO_VISITANTES"
+COL_OCM, COL_ANIO, COL_VISITANTES = "OCM", "ANIO", "NUMERO_VISITANTES"
 COLORES = {
     "Top 1": paleta_turismo[2],
     "Top 2": paleta_turismo[1],
@@ -19,17 +19,17 @@ NO_ESPECIFICADO = {"", "-", "--", "NA", "N/A", "NAN", "NULL", "NONE", "SIN ESPEC
 df: DataFrame | None = st.session_state.get("data")
  
 st.subheader(
-    "Nombre del departamento del Perú donde se ubica la Oficina de Control Migratorio (OCM)"
+    "Nombre de la Oficina de Control Migratorio (OCM)"
 )
 st.write(
     "Ranking por número total de visitantes internacionales registrados en las OCM "
-    "ubicadas en cada departamento."
+    "agrupadas por Nombre de la Oficina de Control Migratorio (OCM)."
 )
  
 if df is None or df.empty:
     st.warning("No hay datos disponibles para mostrar.")
     st.stop()
-faltantes = [c for c in (COL_DEPTO, COL_VISITANTES) if c not in df.columns]
+faltantes = [c for c in (COL_OCM, COL_VISITANTES) if c not in df.columns]
 if faltantes:
     st.error(f"El dataset no contiene la(s) columna(s): {', '.join(faltantes)}.")
     st.stop()
@@ -43,37 +43,37 @@ if COL_ANIO in df.columns:
     if anios:
         datos = df[df[COL_ANIO].isin(anios)]
  
-incluir_sin_depto = st.sidebar.checkbox(
-    "Incluir departamento de la OCM sin especificar ('-')", value=False
+incluir_sin_ocm = st.sidebar.checkbox(
+    "Incluir OCM sin especificar ('-')", value=False
 )
  
 datos = pd.DataFrame(
     {
-        "Departamento": datos[COL_DEPTO].astype("string").str.strip(),
+        "OCM": datos[COL_OCM].astype("string").str.strip(),
         "Visitantes": pd.to_numeric(datos[COL_VISITANTES], errors="coerce").fillna(0),
     }
-).dropna(subset=["Departamento"])
+).dropna(subset=["OCM"])
  
-if not incluir_sin_depto:
-    datos = datos[~datos["Departamento"].str.upper().isin(NO_ESPECIFICADO)]
+if not incluir_sin_ocm:
+    datos = datos[~datos["OCM"].str.upper().isin(NO_ESPECIFICADO)]
  
 conteos = (
-    datos.groupby("Departamento", as_index=False)["Visitantes"]
+    datos.groupby("OCM", as_index=False)["Visitantes"]
     .sum()
-    .sort_values(["Visitantes", "Departamento"], ascending=[False, True], ignore_index=True)
+    .sort_values(["Visitantes", "OCM"], ascending=[False, True], ignore_index=True)
 )
 if conteos.empty:
-    st.warning("No hay registros con un departamento válido para este filtro.")
+    st.warning("No hay registros con una OCM válida para este filtro.")
     st.stop()
  
 total = conteos["Visitantes"].sum()
 conteos["Participación"] = conteos["Visitantes"] / total if total else 0
 conteos["Posición"] = conteos["Visitantes"].rank(method="min", ascending=False).astype(int)
 conteos["Nivel"] = conteos["Posición"].map(lambda p: f"Top {p}" if p <= 3 else "Otros")
-conteos["Etiqueta"] = conteos["Posición"].astype(str) + ". " + conteos["Departamento"]
+conteos["Etiqueta"] = conteos["Posición"].astype(str) + ". " + conteos["OCM"]
  
 cantidad = (
-    st.sidebar.slider("Departamentos a mostrar", 1, len(conteos), min(10, len(conteos)))
+    st.sidebar.slider("OCM a mostrar", 1, len(conteos), min(10, len(conteos)))
     if len(conteos) > 1
     else 1
 )
@@ -82,12 +82,12 @@ grafico = conteos.head(cantidad)
 lider = conteos.iloc[0]
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Total de visitantes", f"{total:,.0f}")
-c2.metric("Departamentos con OCM", f"{len(conteos):,}")
-c3.metric("Departamento OCM con más registros", lider["Departamento"], f"{lider['Participación']:.1%} del total", delta_color="off")
+c2.metric("Oficinas de Control Migratorio", f"{len(conteos):,}")
+c3.metric("OCM con más visitantes", lider["OCM"], f"{lider['Participación']:.1%} del total", delta_color="off")
 c4.metric("Concentración Top 3", f"{conteos.head(3)['Participación'].sum():.1%}")
 st.caption(
-    "El departamento identifica dónde se ubica la OCM; se suma NUMERO_VISITANTES "
-    "registrado en las OCM de cada departamento. No representa el destino visitado."
+    "Oficina de Control Migratorio. Se suman los "
+    "visitantes registrados en cada oficina."
 )
 
 fig = go.Figure()
@@ -104,7 +104,7 @@ for nivel, color in COLORES.items():
         text=[f"{v:,.0f}  ·  {p:.1%}" for v, p in zip(sub["Visitantes"], sub["Participación"])],
         textposition="outside",
         cliponaxis=False,
-        customdata=sub[["Departamento", "Posición", "Participación"]],
+        customdata=sub[["OCM", "Posición", "Participación"]],
         hovertemplate=(
             "<b>%{customdata[0]}</b><br>Posición: #%{customdata[1]}<br>"
             "Visitantes: %{x:,.0f}<br>Participación: %{customdata[2]:.1%}<extra></extra>"
