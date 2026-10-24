@@ -10,7 +10,7 @@ st.set_page_config(layout="wide")
 # Onbtencion de datos cargados
 df: DataFrame = st.session_state.data
 
-st.subheader("¿Cómo ha evolucionado el turismo entre el año 2019 y 2025?")
+st.subheader("¿Cómo ha evolucionado el turismo internacional entre el año 2019 y 2025?")
 
 # Colores definidos por el equipo
 color_principal = paleta_turismo[1]
@@ -147,6 +147,6 @@ st.markdown("#### ¿Qué nos muestran los datos?")
 
 st.write(
     "La llegada de turistas internacionales al Perú disminuyó considerablemente durante la pandemia, alcanzando su punto más bajo en el año 2021."
-    "Desde el año 2022 se observa una recuperación progresiva. Para el año 2025 se alcanzó el {recuperacion:.1f}% del nivel registrado en el año 2019,"
+    "Desde el año 2022 se observa una recuperación progresiva. Para el año 2025 se alcanzó el {recuperacion:.1f}% " "del nivel registrado en el año 2019,"
     "lo que demuestra que, aunque el turismo se está recuperando, todavía no alcanza los niveles anteriores a la pandemia."
 )
