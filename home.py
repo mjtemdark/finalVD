@@ -17,7 +17,7 @@ if "data" not in st.session_state:
 pg = st.navigation([
     st.Page("scripts/dataframe.py", title="Resumen de Datos"),
     st.Page("scripts/page_1.py", title="Gráfico 1 Mapa Coroplético"),
-    st.Page("scripts/page_2.py", title="Grafico 2"),
+    st.Page("scripts/page_2.py", title="Grafico 2 Grafico de Barras Top OCM"),
     st.Page("scripts/page_3.py", title="Grafico 3"),
 ])
 pg.run()

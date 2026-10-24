@@ -9,10 +9,10 @@ st.set_page_config(layout="wide")
 
 COL_OCM, COL_ANIO, COL_VISITANTES = "OCM", "ANIO", "NUMERO_VISITANTES"
 COLORES = {
-    "Top 1": paleta_turismo[2],
-    "Top 2": paleta_turismo[1],
-    "Top 3": paleta_turismo[3],
-    "Otros": paleta_turismo[0],
+    "Top 1": paleta_turismo[4],
+    "Top 2": paleta_turismo[3],
+    "Top 3": paleta_turismo[2],
+    "Otros": paleta_turismo[1],
 }
 NO_ESPECIFICADO = {"", "-", "--", "NA", "N/A", "NAN", "NULL", "NONE", "SIN ESPECIFICAR"}
  
@@ -42,10 +42,7 @@ if COL_ANIO in df.columns:
     )
     if anios:
         datos = df[df[COL_ANIO].isin(anios)]
- 
-incluir_sin_ocm = st.sidebar.checkbox(
-    "Incluir OCM sin especificar ('-')", value=False
-)
+
  
 datos = pd.DataFrame(
     {
@@ -53,9 +50,6 @@ datos = pd.DataFrame(
         "Visitantes": pd.to_numeric(datos[COL_VISITANTES], errors="coerce").fillna(0),
     }
 ).dropna(subset=["OCM"])
- 
-if not incluir_sin_ocm:
-    datos = datos[~datos["OCM"].str.upper().isin(NO_ESPECIFICADO)]
  
 conteos = (
     datos.groupby("OCM", as_index=False)["Visitantes"]
@@ -71,13 +65,6 @@ conteos["Participación"] = conteos["Visitantes"] / total if total else 0
 conteos["Posición"] = conteos["Visitantes"].rank(method="min", ascending=False).astype(int)
 conteos["Nivel"] = conteos["Posición"].map(lambda p: f"Top {p}" if p <= 3 else "Otros")
 conteos["Etiqueta"] = conteos["Posición"].astype(str) + ". " + conteos["OCM"]
- 
-cantidad = (
-    st.sidebar.slider("OCM a mostrar", 1, len(conteos), min(10, len(conteos)))
-    if len(conteos) > 1
-    else 1
-)
-grafico = conteos.head(cantidad)
  
 lider = conteos.iloc[0]
 c1, c2, c3, c4 = st.columns(4)
@@ -126,10 +113,14 @@ fig.update_layout(
     plot_bgcolor="rgba(0,0,0,0)",
     font=dict(family="Inter, Arial, sans-serif", size=13),
     bargap=0.28,
-    legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0, title_text=""),
+    showlegend=False,
 )
 fig.update_xaxes(
-    title="Número de visitantes", tickformat="~s", gridcolor="rgba(255,255,255,0.08)", zeroline=False
+    title="Número de visitantes", 
+    tickformat="~s", 
+    gridcolor="rgba(255,255,255,0.08)", 
+    zeroline=False,
+    showticklabels=False,
 )
 fig.update_yaxes(
     title="",
