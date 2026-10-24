@@ -139,3 +139,9 @@ for fr in fig.frames:
     fr.layout = go.Layout(annotations=[anotacion(texto_stats(fr.name))])
 
 st.plotly_chart(fig, width="stretch")
+
+st.subheader("Resumen")
+st.write("""El gráfico animado nos muestra la evolución de la llegada de turistas pre y post pandemia
+podemos visualizar que la mayoria de turistas provienen de Chile y EE.UU, se puede observar el cambio
+en los años de pandemia donde no hubo afluencia.
+ """)
