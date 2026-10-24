@@ -10,7 +10,7 @@ st.set_page_config(layout="wide")
 # Onbtencion de datos cargados
 df: DataFrame = st.session_state.data
 
-st.subheader("Llegadas de turistas internacionales al Perú")
+st.subheader("¿Cómo ha evolucionado el turismo entre el año 2019 y 2025?")
 
 # Colores definidos por el equipo
 color_principal = paleta_turismo[1]
@@ -20,8 +20,7 @@ color_maximo = paleta_turismo[0]
 # Preparacion de datos
 datos = (
     df[
-        (df["ANIO"].between(2019, 2025)) &
-        (df["ANIO"] != 2020)
+        (df["ANIO"].between(2019, 2025))
     ]
     .groupby("ANIO", as_index=False)["NUMERO_VISITANTES"]
     .sum()
@@ -30,6 +29,25 @@ datos = (
 
 # Convercion a millones para que el gráfico sea más legible
 datos["VISITANTES_MILLONES"] = datos["NUMERO_VISITANTES"] / 1_000_000
+
+# Indicadores de turismo
+turistas_2019 = datos.loc[
+    datos["ANIO"] == 2019, "VISITANTES_MILLONES"
+].iloc[0]
+
+turistas_2025 = datos.loc[
+    datos["ANIO"] == 2025, "VISITANTES_MILLONES"
+].iloc[0]
+
+turistas_min = datos["VISITANTES_MILLONES"].min()
+
+recuperacion = (turistas_2025 / turistas_2019) * 100
+
+col1, col2, col3 = st.columns(3)
+
+col1.metric("Turistas en 2019", f"{turistas_2019:.2f} M")
+col2.metric("Mínimo registrado", f"{turistas_min:.2f} M")
+col3.metric("Recuperación en 2025", f"{recuperacion:.1f}%")
 
 # Grafico temporal
 fig = px.line(
@@ -109,9 +127,26 @@ fig.update_layout(
         rangemode="tozero"
     ),
     hovermode="x unified",
-    height=600,
+    height=480,
     margin=dict(l=40, r=40, t=80, b=40),
     legend_title_text=""
 )
 
+# Referencia del turismo antes de la pandemia
+fig.add_hline(
+    y=turistas_2019,
+    line_dash="dash",
+    line_color=paleta_turismo[0],
+    annotation_text="Nivel de 2019",
+    annotation_position="bottom right"
+)
+
 st.plotly_chart(fig, width="stretch", config={"displaylogo": False})
+
+st.markdown("#### ¿Qué nos muestran los datos?")
+
+st.write(
+    "La llegada de turistas internacionales al Perú disminuyó considerablemente durante la pandemia, alcanzando su punto más bajo en el año 2021."
+    "Desde el año 2022 se observa una recuperación progresiva. Para el año 2025 se alcanzó el {recuperacion:.1f}% del nivel registrado en el año 2019,"
+    "lo que demuestra que, aunque el turismo se está recuperando, todavía no alcanza los niveles anteriores a la pandemia."
+)
