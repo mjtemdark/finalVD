@@ -65,6 +65,7 @@ conteos["Participación"] = conteos["Visitantes"] / total if total else 0
 conteos["Posición"] = conteos["Visitantes"].rank(method="min", ascending=False).astype(int)
 conteos["Nivel"] = conteos["Posición"].map(lambda p: f"Top {p}" if p <= 3 else "Otros")
 conteos["Etiqueta"] = conteos["Posición"].astype(str) + ". " + conteos["OCM"]
+grafico = conteos
  
 lider = conteos.iloc[0]
 c1, c2, c3, c4 = st.columns(4)
