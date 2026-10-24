@@ -147,6 +147,6 @@ st.markdown("#### ¿Qué nos muestran los datos?")
 
 st.write(
     "La llegada de turistas internacionales al Perú disminuyó considerablemente durante la pandemia, alcanzando su punto más bajo en el año 2021."
-    "Desde el año 2022 se observa una recuperación progresiva. Para el año 2025 se alcanzó el {recuperacion:.1f}%" 
+    f"Desde el año 2022 se observa una recuperación progresiva. Para el año 2025 se alcanzó el {recuperacion:.1f}%" 
     "del nivel registrado en el año 2019, lo que demuestra que, aunque el turismo se está recuperando, todavía no alcanza los niveles anteriores a la pandemia."
 )
