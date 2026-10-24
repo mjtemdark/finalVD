@@ -107,7 +107,7 @@ fig.add_vline(
     annotation_font=dict(size=11, color="rgba(255,255,255,0.6)"),
 )
 fig.update_layout(
-    template="plotly_dark",
+    template="seaborn",
     height=max(420, len(grafico) * 44 + 120),
     margin=dict(l=10, r=150, t=50, b=10),
     paper_bgcolor="rgba(0,0,0,0)",
