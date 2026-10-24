@@ -74,7 +74,7 @@ def anotacion(txt):
     return dict(
         text=txt, x=0.5, y=1.0, xref="paper", yref="paper",
         xanchor="center", yanchor="bottom", showarrow=False,
-        font=dict(size=16),
+        font=dict(size=24),
     )
 
 
@@ -88,10 +88,10 @@ fig = px.choropleth(
     locationmode="ISO-3",
     color="valor",
     animation_frame="ANIO",
-    labels={"ANIO": "Año","NUMERO_VISITANTES":"Numero de visitantes"},
+    labels={"ANIO": "Año", "NUMERO_VISITANTES": "Numero de visitantes"},
     range_color=(datos["valor"].min(), datos["valor"].max()),  # misma escala en todos los años
     hover_name="PAIS",
-    hover_data={"ISO3": False, "valor": False, "NUMERO_VISITANTES":":,.0f"},
+    hover_data={"ISO3": False, "valor": False, "NUMERO_VISITANTES": ":,.0f"},
     color_continuous_scale=escala_mapa,
     projection=proyeccion,
 )
@@ -113,21 +113,23 @@ fig.update_geos(
     projection_rotation=dict(lon=0, lat=0, roll=0),
     showframe=False,
     showcoastlines=True,
-    coastlinecolor="#9aa5b1",
+    coastlinecolor="#000",
     coastlinewidth=0.5,
     showland=True,
+    bgcolor="#0D1321",
     landcolor="#eceff3",
     showocean=True,
     oceancolor="#dcebf7",
     showcountries=True,
-    countrycolor="#ffffff",
+    countrycolor="#fff",
     showlakes=False,
 )
-fig.update_traces(marker_line_color="#ffffff", marker_line_width=0.4)
+fig.update_traces(marker_line_color="#000", marker_line_width=0.4)
 fig.update_layout(
     height=alto,
     margin=dict(l=0, r=0, t=50, b=0),  # espacio arriba para las estadísticas
     paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
     font=dict(family="Inter, Arial, sans-serif", size=13),
 )
 
