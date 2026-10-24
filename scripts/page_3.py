@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 from pandas import DataFrame
+from helpers.colors import paleta_turismo
 
 st.set_page_config(layout="wide")
 
@@ -11,11 +12,20 @@ df: DataFrame = st.session_state.data
 
 st.subheader("Llegadas de turistas internacionales al Perú")
 
+# Colores definidos por el equipo
+color_principal = paleta_turismo[1]
+color_minimo = paleta_turismo[2]
+color_maximo = paleta_turismo[0]
+
 # Preparacion de datos
 datos = (
-    df.groupby("ANIO", as_index=False)["NUMERO_VISITANTES"]
-      .sum()
-      .sort_values("ANIO")
+    df[
+        (df["ANIO"].between(2019, 2025)) &
+        (df["ANIO"] != 2020)
+    ]
+    .groupby("ANIO", as_index=False)["NUMERO_VISITANTES"]
+    .sum()
+    .sort_values("ANIO")
 )
 
 # Convercion a millones para que el gráfico sea más legible
@@ -27,70 +37,62 @@ fig = px.line(
     x="ANIO",
     y="VISITANTES_MILLONES",
     markers=True,
+    color_discrete_sequence=[color_principal],
     labels={
         "ANIO": "Año",
         "VISITANTES_MILLONES": "Llegadas de turistas (millones)"
     }
 )
 
-# Etiquetas
+# Estilo de la línea y sus puntos
 fig.update_traces(
-    text=[f"{x:.2f} M" for x in datos["VISITANTES_MILLONES"]],
-    textposition="top center",
     line=dict(width=3),
     marker=dict(size=9)
 )
 
-# Resaltamos los puntos mínimos y máximos
+# Identificamos el mínimo y máximo
 fila_min = datos.loc[datos["VISITANTES_MILLONES"].idxmin()]
 fila_max = datos.loc[datos["VISITANTES_MILLONES"].idxmax()]
 
+# Resaltamos el mínimo
 fig.add_trace(
     go.Scatter(
         x=[fila_min["ANIO"]],
         y=[fila_min["VISITANTES_MILLONES"]],
-        mode="markers",
-        marker=dict(size=14),
-        name="Mínimo",
-        hovertemplate=(
-            f"Año: {int(fila_min['ANIO'])}<br>"
-            f"Turistas: {fila_min['VISITANTES_MILLONES']:.2f} M"
-            "<extra></extra>"
-        )
+        mode="markers+text",
+        text=[f"Mínimo: {fila_min['VISITANTES_MILLONES']:.2f} M"],
+        textposition="bottom center",
+        textfont=dict(
+            color=color_minimo,
+            size=14
+        ),
+        marker=dict(
+            size=14,
+            color=color_minimo
+        ),
+        name="Mínimo"
     )
 )
 
+# Resaltamos el máximo
 fig.add_trace(
     go.Scatter(
         x=[fila_max["ANIO"]],
         y=[fila_max["VISITANTES_MILLONES"]],
-        mode="markers",
-        marker=dict(size=14),
-        name="Máximo",
-        hovertemplate=(
-            f"Año: {int(fila_max['ANIO'])}<br>"
-            f"Turistas: {fila_max['VISITANTES_MILLONES']:.2f} M"
-            "<extra></extra>"
-        )
+        mode="markers+text",
+        text=[f"Máximo: {fila_max['VISITANTES_MILLONES']:.2f} M"],
+        textposition="top center",
+        textfont=dict(
+            color=color_maximo,
+            size=14
+        ),
+        marker=dict(
+            size=14,
+            color=color_maximo
+        ),
+        name="Máximo"
     )
 )
-
-# Anotación de la caída en el año 2022
-if 2020 in datos["ANIO"].values:
-    valor_2020 = datos.loc[
-        datos["ANIO"] == 2020,
-        "VISITANTES_MILLONES"
-    ].iloc[0]
-
-    fig.add_annotation(
-        x=2020,
-        y=valor_2020,
-        text="Fuerte caída en 2020",
-        showarrow=True,
-        arrowhead=2,
-        ax=70,
-        ay=-40
-    )
 
 # Estilos del gráfico
 fig.update_layout(
@@ -100,7 +102,8 @@ fig.update_layout(
         "xanchor": "left"
     },
     xaxis=dict(
-        dtick=1
+        dtick=1,
+        tickformat="d"
     ),
     yaxis=dict(
         rangemode="tozero"
@@ -112,5 +115,3 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, width="stretch")
-
-st.caption("Fuente: MINCETUR")
