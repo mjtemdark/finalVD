@@ -60,7 +60,7 @@ fig.add_trace(
         x=[fila_min["ANIO"]],
         y=[fila_min["VISITANTES_MILLONES"]],
         mode="markers+text",
-        text=[f"Mínimo: {fila_min['VISITANTES_MILLONES']:.2f} M"],
+        text=[f"{fila_min['VISITANTES_MILLONES']:.2f} M"],
         textposition="bottom center",
         textfont=dict(
             color=color_minimo,
@@ -80,7 +80,7 @@ fig.add_trace(
         x=[fila_max["ANIO"]],
         y=[fila_max["VISITANTES_MILLONES"]],
         mode="markers+text",
-        text=[f"Máximo: {fila_max['VISITANTES_MILLONES']:.2f} M"],
+        text=[f"{fila_max['VISITANTES_MILLONES']:.2f} M"],
         textposition="top center",
         textfont=dict(
             color=color_maximo,
@@ -114,4 +114,4 @@ fig.update_layout(
     legend_title_text=""
 )
 
-st.plotly_chart(fig, width="stretch")
+st.plotly_chart(fig, width="stretch", config={"displaylogo": False})
