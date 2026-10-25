@@ -17,10 +17,10 @@ if "data" not in st.session_state:
     st.session_state.data = cargar_datos()
 
 pg = st.navigation([
-    st.Page("scripts/dataframe.py", title="Resumen de Datos"),
-    st.Page("scripts/page_1.py", title="Mapa Coroplético Visitas por País"),
-    st.Page("scripts/page_3.py", title="Evolución anual de visitas"),
-    st.Page("scripts/page_2.py", title="Grafico de Barras Top OCM"),
+    st.Page("scripts/dataframe.py", title="Resumen de Datos", icon=":material/dataset:"),
+    st.Page("scripts/page_1.py", title="Mapa Coroplético Visitas por País", icon=":material/public:"),
+    st.Page("scripts/page_3.py", title="Evolución anual de visitas", icon=":material/stacked_line_chart:"),
+    st.Page("scripts/page_2.py", title="Grafico de Barras Top OCM", icon=":material/leaderboard:"),
 
 ])
 pg.run()
